@@ -2,7 +2,7 @@
     "name": "k1sul1/custom-admin-notices",
     "description": "This plugin allows you to create your own notices that show up in the WordPress admin.",
     "type": "wordpress-plugin",
-    "license": "GPL",
+    "license": "GPL-3.0+",
     "authors": [
         {
             "name": "Christian Nikkanen",
@@ -10,5 +10,7 @@
         }
     ],
     "minimum-stability": "stable",
-    "require": {}
+    "require": {
+      "php": ">=5.2"
+    }
 }
