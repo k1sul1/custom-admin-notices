@@ -1,9 +1,8 @@
 === Custom admin notices ===
 Contributors: k1sul1
-Donate link: http://example.com/
 Tags: notice, admin, attention
 Requires at least: 4.3
-Tested up to: 4.5
+Tested up to: 4.5.3
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
