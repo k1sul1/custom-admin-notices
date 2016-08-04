@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Custom admin notices
- * Version: 0.1
+ * Version: 0.1.2
  * Description: This plugin allows you to create your own notices that show up in the WordPress admin.
  * Author: Christian Nikkanen
  * Author URI: https://github.com/k1sul1/
@@ -96,7 +96,10 @@ class customAdminNotices {
   }
 
   public function checkBanners(){
-    $posts = get_posts(array("post_type" => "custom_notice", "posts_per_page" => -1));
+    $arguments = array("post_type" => "custom_notice", "posts_per_page" => -1, "status" => "publish");
+    $arguments = apply_filters("custom-admin-notices_banner_arguments", $arguments);
+
+    $posts = get_posts($arguments);
 
     $current_user =  get_current_user_id();
     $script = <<<EOT
