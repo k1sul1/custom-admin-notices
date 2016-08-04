@@ -25,6 +25,5 @@ Contributing
 ---
 Contributions welcome! Feature wishlist:
 
-* Remove all data on plugin uninstall
 * More hooks!
 * Translations?
