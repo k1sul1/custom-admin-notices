@@ -9,21 +9,11 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 This plugin adds a new post type called notices that are displayed in the WordPress admin.
 
 == Description ==
-
 This plugin adds a new post type called notices that are displayed in the WordPress admin. You can dismiss the notices, or make them in-dismissible, and choose from three different types. These notices can be used for whatever your heart may desire.
 
-
-== Installation ==
-
-
 == Frequently Asked Questions ==
-
+- Why would I use this? 
+If you need a handy way to annoy your users with
 
 == Screenshots ==
-
 1. View from WP-admin.
-
-== Changelog ==
-
-= 0.1 =
-It's working.
