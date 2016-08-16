@@ -1,6 +1,8 @@
 #Custom admin notices
 This WordPress plugin allows you to easily create custom notices that are displayed in WP-admin.
 
+### Option saving is broken at the moment and will be fixed ASAP. Developer has cats to feed.
+
 Installing
 ---
 Easiest way to install is with composer:

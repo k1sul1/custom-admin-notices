@@ -21,23 +21,23 @@ class customAdminNotices {
       "menu_position" => 80
     ));
 
-    add_action("add_meta_boxes", array($this, "drawOptions"));
-    add_action("save_post", array($this, "saveOptions"));
+    add_action("add_meta_boxes", array($this, "renderMetabox"));
+    add_action("save_post", array($this, "saveMeta"));
     add_action("wp_ajax_notice_dismissed", array($this, "ajaxDismiss"));
   }
 
-  private function drawMetaOptions(){
-    add_meta_box(
+  public function renderMetabox(){
+    return add_meta_box(
         "custom_notice_settings",
         __("Notice settings", "custom-admin-notices"),
-        array($this, "drawOptions"),
+        array($this, "renderMetaboxOptions"),
         "custom_notice",
         "side",
         "high"
     );
   }
 
-  private function drawOptions(){
+  public function renderMetaboxOptions(){
     global $post;
     $current_type = get_post_meta($post->ID, "custom-admin-notices-type", true);
     $nonce = wp_create_nonce(plugin_basename(__FILE__));
@@ -53,10 +53,11 @@ class customAdminNotices {
     <?php
   }
 
-  private function saveOptions(){
+  public function saveMeta(){
       $nonce = !empty($_POST['custom-admin-notices_noncename']) ? $_POST['custom-admin-notices_noncename'] : false;
       $dismissible = !empty($_POST['custom-admin-notices-dismissible']) ? $_POST['custom-admin-notices-dismissible'] : false;
       $type = !empty($_POST["custom-admin-notices-type"]) ? $_POST["custom-admin-notices-type"] : false;
+
 
       if (!wp_verify_nonce($nonce, plugin_basename(__FILE__))) {
         return $post_id;
@@ -77,7 +78,7 @@ class customAdminNotices {
       return $post_id;
   }
 
-  private function ajaxDismiss(){
+  public function ajaxDismiss(){
       $user = (int) $_POST['user_id'];
       $notice_id = (int) $_POST['notice_id'];
 
@@ -146,13 +147,13 @@ EOT;
       }
 
       if(!$user_dismissed){
-        $this->createBanner($type, $content, $is_dismissible, $post->ID);
+        $this->renderBanner($type, $content, $is_dismissible, $post->ID);
       }
 
     }
   }
 
-  public function createBanner($type, $content, $is_dismissible = true, $notice_id){
+  public function renderBanner($type, $content, $is_dismissible = true, $notice_id){
     $types = $this->types;
 
     if(!in_array($type, $types)){

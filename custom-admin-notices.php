@@ -11,7 +11,9 @@
 
 require_once("classes/class.custom-admin-notices.php");
 
-add_action("init", function(){
+add_action("init", "custom_admin_notices_init");
+
+function custom_admin_notices_init(){
   global $custom_admin_notices;
   $custom_admin_notices =  new customAdminNotices();
-});
+}
