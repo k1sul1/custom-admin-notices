@@ -53,7 +53,12 @@ class customAdminNotices {
     <?php
   }
 
-  public function saveMeta(){
+  public function saveMeta($post_id){
+    
+      if(!$post_id){
+        return false;
+      }
+
       $nonce = !empty($_POST['custom-admin-notices_noncename']) ? $_POST['custom-admin-notices_noncename'] : false;
       $dismissible = !empty($_POST['custom-admin-notices-dismissible']) ? $_POST['custom-admin-notices-dismissible'] : false;
       $type = !empty($_POST["custom-admin-notices-type"]) ? $_POST["custom-admin-notices-type"] : false;
