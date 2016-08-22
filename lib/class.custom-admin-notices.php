@@ -1,5 +1,7 @@
 <?php
 
+use k1sul1\custom_admin_notices\Settings;
+
 class customAdminNotices {
 
   public $types = array("error", "warning", "info");
@@ -40,18 +42,73 @@ class customAdminNotices {
 
   public function renderMetaboxOptions(){
     global $post;
-    $current_type = get_post_meta($post->ID, "custom-admin-notices-type", true);
-    $nonce = wp_create_nonce(plugin_basename(__FILE__));
-    ?>
-    <input type='hidden' name='custom-admin-notices_noncename' value='<?php echo $nonce; ?>' />
-    <p><?php echo __("Notice type", "custom-admin-notices"); ?></p>
-    <label><input type="radio" name="custom-admin-notices-type" value="error" <?php checked($current_type, "error"); ?>> <?php echo __("Error", "custom-admin-notices"); ?></label><br>
-    <label><input type="radio" name="custom-admin-notices-type" value="warning" <?php checked($current_type, "warning"); ?>> <?php echo __("Warning", "custom-admin-notices"); ?></label><br>
-    <label><input type="radio" name="custom-admin-notices-type" value="info" <?php checked($current_type, "info"); ?>> <?php echo __("Info", "custom-admin-notices"); ?></label><br>
-    <p><?php echo __("Is dismissible?", "custom-admin-notices"); ?></p>
-    <label><input type="checkbox" name="custom-admin-notices-dismissible" value="1" <?php checked(get_post_meta($post->ID, "custom-admin-notices-dismissible", true), "1"); ?>> <?php echo __("Yes", "custom-admin-notices"); ?></label><br>
 
-    <?php
+    $noticeType = get_post_meta($post->ID, "can_type", true);
+    $dismissible = get_post_meta($post->ID, "can_dismissible", true);
+    $environment = get_post_meta($post->ID, "can_environment", true);
+
+    $nonce = wp_create_nonce(plugin_basename(__FILE__));
+
+    $options = Settings\getFieldValues(true, "default");
+    var_dump($options);
+
+    echo "<input type='hidden' name='can_noncename' value='$nonce'>";
+
+    echo "<p>" . __("Notice type", "custom-admin-notices") . "</p>";
+
+    foreach($this->types as $type){
+      $checked = checked($noticeType, $type, false);
+
+      echo "<label>";
+      echo "<input type='radio' name='can_type' value='$type' $checked>";
+      echo ucfirst($type);
+      echo "</label>";
+      echo "<br>";
+    }
+
+    echo "<p>" . __("Is dismissible?", "custom-admin-notices") . "</p>";
+
+    $checked =  checked($dismissible, "1", false);
+
+    echo "<label>";
+    echo "<input type='checkbox' name='can_dismissible' value='1' $checked>";
+    echo __("Yes", "custom-admin-notices");
+    echo "</label>";
+    echo "<br>";
+
+
+    if($options["allow-environments"]){
+      echo "<p>" . __("Show only when these criterias are met?", "custom-admin-notices") . "</p>";
+
+      if($options["determine-environment"]){
+        foreach(explode("\n", strtolower($options["environments"])) as $line){
+          $checked = "";
+
+          if(strpos($environment, $line) > -1){
+            $checked = "checked='checked'";
+          }
+
+          echo "<label><input type='checkbox' name='can_environment[]' value='$line' $checked>";
+          echo $line;
+          echo "</label>";
+          echo "<br>";
+        }
+      ?>
+
+      <?php
+      } else {
+        $value = "";
+
+        if(!empty($environment)){
+          $value = "value='$environment'";
+        }
+
+        echo "<label>Match by URL:<br>";
+        echo "<input type='text' name='can_environment' placeholder='example.dev' $value>";
+        echo "</label><br>";
+      }
+
+    }
   }
 
   public function saveMeta($post_id){
@@ -60,27 +117,53 @@ class customAdminNotices {
         return false;
       }
 
-      $nonce = !empty($_POST['custom-admin-notices_noncename']) ? $_POST['custom-admin-notices_noncename'] : false;
-      $dismissible = !empty($_POST['custom-admin-notices-dismissible']) ? $_POST['custom-admin-notices-dismissible'] : false;
-      $type = !empty($_POST["custom-admin-notices-type"]) ? $_POST["custom-admin-notices-type"] : false;
+      $options = Settings\getFieldValues(true, "default");
+      $allowed = true;
+      $p = $_POST;
 
-
-      if (!wp_verify_nonce($nonce, plugin_basename(__FILE__))) {
-        return $post_id;
+      foreach($p as $key => $value){
+        $p[$key] = stripslashes(strip_tags($value));
       }
 
-      if (!current_user_can('edit_post', $post_id)){
-        return $post_id;
-      }
+      $nonce = !empty($p['can_noncename']) ? wp_verify_nonce($p['can_noncename'], plugin_basename(__FILE__)) : false;
+      $can_edit = current_user_can('edit_post', $post_id);
 
-      if(!in_array($type, $this->types)){
-        return $post_id;
-      }
-
+      $dismissible = !empty($p['can_dismissible']) ? $p['can_dismissible'] : false;
       $is_dismissible = !empty($dismissible) ? 1 : 0;
 
-      update_post_meta($post_id, "custom-admin-notices-dismissible", $is_dismissible);
-      update_post_meta($post_id, "custom-admin-notices-type", $type);
+      $type = !empty($p['can_type']) ? $p['can_type'] : false;
+      $type_allowed = in_array($type, $this->types);
+
+      $env = !empty($p['can_environment']) ? $p['can_environment'] : false;
+
+      // No one got time for overly protective data validation.
+
+      /*if($options['determine-environment']){
+        // checkboxes
+        $envs = explode("\n", strtolower($options["environments"]));
+        foreach($env as $check){
+          $env_allowed = in_array($check, $envs);
+          if(!$env_allowed){
+            // Some shady stuff going on.
+            return false;
+          }
+        }
+      } else {
+        $env_allowed = strpos($options['environments'], $env) > -1 ? true : false;
+      }
+
+      if ($nonce || !$can_edit || !$type_allowed || !$env_allowed) {
+        $allowed = false;
+      }
+
+      if(!$allowed){
+        return false;
+      }*/
+
+      update_post_meta($post_id, "can_dismissible", $is_dismissible);
+      update_post_meta($post_id, "can_type", $type);
+      update_post_meta($post_id, "can_environment", $env);
+
       return $post_id;
   }
 
@@ -100,7 +183,9 @@ class customAdminNotices {
 
   public function checkBanners(){
     $arguments = array("post_type" => "custom_notice", "posts_per_page" => -1, "status" => "publish");
-    $arguments = apply_filters("custom-admin-notices_banner_arguments", $arguments);
+    $arguments = apply_filters("can_banner_arguments", $arguments);
+
+    $options = Settings\getFieldValues(true, "default");
 
     $posts = get_posts($arguments);
 
@@ -129,22 +214,36 @@ EOT;
       setup_postdata($post);
 
       $header = "<h2>" . apply_filters("the_title", $post->post_title) . "</h2>";
-      $header = apply_filters("custom-admin-notices_notice_title", $header, $post->ID);
+      $header = apply_filters("can_notice_title", $header, $post->ID);
 
       $text = apply_filters("the_content", $post->post_content);
-      $text = apply_filters("custom-admin-notices_notice_content", $text, $post->ID);
+      $text = apply_filters("can_notice_content", $text, $post->ID);
 
       $content = $header . $text;
 
-      $is_dismissible = (int) get_post_meta($post->ID, "custom-admin-notices-dismissible", true);
-      $is_dismissible = apply_filters("custom-admin-notices-is_dismissible", $is_dismissible, $post->ID);
+      $is_dismissible = (int) get_post_meta($post->ID, "can_dismissible", true);
+      $is_dismissible = apply_filters("can_is_dismissible", $is_dismissible, $post->ID);
       // Allow filtering the dismissible status. Basically allows to always enable dismissing or disable it, or per post.
 
-      $type =  get_post_meta($post->ID, "custom-admin-notices-type", true);
+      $type =  get_post_meta($post->ID, "can_type", true);
 
       $user_dismissed = get_user_meta(get_current_user_id(), "dismissed_notices", true);
       $user_dismissed = empty($user_dismissed) ? array() : $user_dismissed;
       $user_dismissed = in_array($post->ID, $user_dismissed);
+
+      $env = get_post_meta($post->ID, "can_environment", true);
+
+      if($options["determine-environment"] && $options["allow-environments"]){
+        if(!in_array(getenv("WP_ENV"), $env)){
+          return false;
+        }
+      } elseif($options["allow-environments"]) {
+        $pageurl = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+        $env = !empty($env) ? $env : 'not-empty-needle'; // FFS if your URL actually contains "not-empty-needle".
+        if(!(strpos($pageurl, $env) > -1)){
+          return false;
+        }
+      }
 
 
       if(!$is_dismissible){
