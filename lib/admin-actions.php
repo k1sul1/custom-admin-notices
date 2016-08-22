@@ -6,11 +6,11 @@ use k1sul1\custom_admin_notices\Settings as Settings;
 
 // Add admin actions and handlers here
 
-add_action("init", array(__NAMESPACE__, "init"));
+add_action("init", __NAMESPACE__ . "\\initialize");
 
-function init(){
+function initialize(){
   global $custom_admin_notices;
-  $custom_admin_notices =  new customAdminNotices();
+  $custom_admin_notices =  new \customAdminNotices(); // It's in global namespace.
 }
 
 
@@ -278,6 +278,8 @@ function renderCheckbox($args)
 {
     $useKeyForValue = isAssocArray($args[Settings\PROP_OPTIONS]);
     $valueFlipped = is_array($args[Settings\PROP_VALUE]) ? array_flip($args[Settings\PROP_VALUE]) : array();
+
+    error_log(json_encode(Settings\PROP_OPTIONS));
 
     foreach ($args[Settings\PROP_OPTIONS] as $value => $label):
         $selected = array_key_exists($useKeyForValue ? $value : $label, $valueFlipped);

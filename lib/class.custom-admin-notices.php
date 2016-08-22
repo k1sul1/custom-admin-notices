@@ -1,4 +1,5 @@
 <?php
+
 class customAdminNotices {
 
   public $types = array("error", "warning", "info");
@@ -54,7 +55,7 @@ class customAdminNotices {
   }
 
   public function saveMeta($post_id){
-    
+
       if(!$post_id){
         return false;
       }

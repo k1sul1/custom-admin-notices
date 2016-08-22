@@ -22,6 +22,17 @@ function getFields()
     // Add fields here
     return array(
         array(
+          PROP_SECTION => SECTION_DEFAULT,
+          PROP_TYPE => FIELD_CHECKBOX,
+          PROP_NAME => "allow-environments",
+          PROP_TITLE => "Allow environments? (Bedrock)",
+          PROP_DEFAULT => false,
+          PROP_DESCRIPTION => "Enabling this will allow you to select enviroments
+          in which the notice will be shown. Exceptionally useful if you want to show a notice
+          for yourself only.",
+          PROP_PLACEHOLDER => "?"
+        ),
+        array(
             PROP_SECTION => SECTION_DEFAULT,
             PROP_TYPE => FIELD_TEXT,
             PROP_NAME => "field-name",
