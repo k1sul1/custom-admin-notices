@@ -81,7 +81,7 @@ class customAdminNotices {
       echo "<p>" . __("Show only when these criterias are met?", "custom-admin-notices") . "</p>";
 
       if($options["determine-environment"]){
-        foreach(explode("\n", strtolower($options["environments"])) as $line){
+        foreach(explode("\r\n", strtolower($options["environments"])) as $line){
           $checked = "";
 
           if(strpos($environment, $line) > -1){
@@ -140,7 +140,7 @@ class customAdminNotices {
 
       /*if($options['determine-environment']){
         // checkboxes
-        $envs = explode("\n", strtolower($options["environments"]));
+        $envs = explode("\r\n", strtolower($options["environments"]));
         foreach($env as $check){
           $env_allowed = in_array($check, $envs);
           if(!$env_allowed){
