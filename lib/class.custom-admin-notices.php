@@ -253,7 +253,7 @@ EOT;
         // If the notice isn't dismissible, show it for all users even if they dismissed it.
       }
 
-      if(!$show_banner){
+      if($show_banner){
         $this->renderBanner($type, $content, $is_dismissible, $post->ID);
       }
 
