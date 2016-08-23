@@ -212,6 +212,7 @@ EOT;
 
     foreach($posts as $post){
       setup_postdata($post);
+      $show_banner = true;
 
       $header = "<h2>" . apply_filters("the_title", $post->post_title) . "</h2>";
       $header = apply_filters("can_notice_title", $header, $post->ID);
@@ -235,23 +236,24 @@ EOT;
 
       if($options["determine-environment"] && $options["allow-environments"]){
         if(!in_array(getenv("WP_ENV"), $env)){
-          return false;
+          $show_banner = false;
         }
       } elseif($options["allow-environments"]) {
         $pageurl = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
         $env = !empty($env) ? $env : 'not-empty-needle'; // FFS if your URL actually contains "not-empty-needle".
         if(!(strpos($pageurl, $env) > -1)){
-          return false;
+          $show_banner = false;
         }
       }
 
 
       if(!$is_dismissible){
         $user_dismissed = false;
+        $show_banner = false;
         // If the notice isn't dismissible, show it for all users even if they dismissed it.
       }
 
-      if(!$user_dismissed){
+      if(!$show_banner){
         $this->renderBanner($type, $content, $is_dismissible, $post->ID);
       }
 
