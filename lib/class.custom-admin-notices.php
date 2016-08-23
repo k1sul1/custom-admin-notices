@@ -117,11 +117,19 @@ class customAdminNotices {
         return false;
       }
 
+      if(get_post_type($post_id) !== "notice"){
+        return $post_id;
+      }
+
       $options = Settings\getFieldValues(true, "default");
       $allowed = true;
       $p = $_POST;
 
       foreach($p as $key => $value){
+        if(strpos($key, "can_") !== 0){
+          continue;
+        }
+
         $p[$key] = stripslashes(strip_tags($value));
       }
 
