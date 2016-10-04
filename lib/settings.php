@@ -11,8 +11,8 @@ function getSections()
     // Add Setting sections here
     return array(
         SECTION_DEFAULT => array(
-            PROP_TITLE => "",
-            PROP_DESCRIPTION => ""
+            PROP_TITLE => "Section Title",
+            PROP_DESCRIPTION => "Optional section description"
         )
     );
 }
@@ -20,37 +20,17 @@ function getSections()
 function getFields()
 {
     // Add fields here
-    $fields = array(
+    return array(
         array(
-          PROP_SECTION => SECTION_DEFAULT,
-          PROP_TYPE => FIELD_SELECT,
-          PROP_NAME => "allow-environments",
-          PROP_TITLE => "Allow environments? (Bedrock)",
-          PROP_DEFAULT => false,
-          PROP_DESCRIPTION => "Enabling this will allow you to select environments
-          in which the notice will be shown.<br>Exceptionally useful if you want to show a notice
-          for yourself only.",
-          PROP_OPTIONS => array("true" => "Yes", "false" => "No")
-        ),
-        array(
-          PROP_SECTION => SECTION_DEFAULT,
-          PROP_TYPE => FIELD_RADIO,
-          PROP_NAME => "determine-environment",
-          PROP_TITLE => "Determine environment from WP_ENV?",
-          PROP_DEFAULT => false,
-          PROP_DESCRIPTION => "Enable to determine environment from WP_ENV environment variable. Default is match-by-URL.<br>Only effective if allow-environments is set to true.",
-          PROP_OPTIONS => array("true" => "Yes", "false" => "No")
-        ),
-        array(
-          PROP_SECTION => SECTION_DEFAULT,
-          PROP_TYPE => FIELD_TEXT_MULTILINE,
-          PROP_NAME => "environments",
-          PROP_TITLE => "Environments",
-          PROP_DEFAULT => "development\nstaging\nproduction",
-          PROP_DESCRIPTION => "List environments in use. One environment per line. Case insensitive. <br>Defaults: development, staging, production."
+            PROP_SECTION => SECTION_DEFAULT,
+            PROP_TYPE => FIELD_TEXT,
+            PROP_NAME => "field-name",
+            PROP_TITLE => "Field title",
+            PROP_DEFAULT => "default value when empty",
+            PROP_DESCRIPTION => "Optional field description",
+            PROP_PLACEHOLDER => "Field content placeholder"
         )
     );
-    return $fields;
 }
 
 // If version migrations need work done, here's the place to do it
@@ -73,6 +53,7 @@ const FIELD_NUMBER = "number";
 const FIELD_SELECT = "select";
 const FIELD_RADIO = "radio";
 const FIELD_CHECKBOX = "checkbox";
+const FIELD_TOGGLE = "toggle";
 
 /* Field/Section properties */
 const PROP_DEFAULT = "default";
@@ -106,6 +87,8 @@ const S_PLUGIN_VERSION = "plugin_version";
 
 /* Default unselected value for radio/checkbox/select */
 const V_UNSELECTED_VALUE = "____no_selection____";
+const V_LITERAL_FALSE = "____false____";
+const V_LITERAL_TRUE = "____true____";
 
 add_action("admin_init", __NAMESPACE__ . "\\registerSettings");
 
@@ -145,7 +128,9 @@ function getFieldValues($setDefault = false, $section = false)
             ? $fieldName
             : $attribs[PROP_NAME];
 
-        if (is_array($option) && array_key_exists($fieldName, $option) && !empty($option[$fieldName])) {
+        if ($attribs[PROP_TYPE] === FIELD_TOGGLE && !is_null($option[$fieldName])) {
+            $values[$exportKey] = !!$option[$fieldName];
+        } elseif (is_array($option) && array_key_exists($fieldName, $option) && !empty($option[$fieldName])) {
             $values[$exportKey] = $option[$fieldName];
         } elseif ($setDefault) {
             $values[$exportKey] = $attribs[PROP_DEFAULT];
@@ -236,9 +221,19 @@ function sanitize($input)
 
         $transientValue = $input[$fieldName];
 
-        // ____no_selection____ is the default value placeholder in selects
-        if ($transientValue === V_UNSELECTED_VALUE) {
-            $transientValue = null;
+        // Map symbolic values into their actual value
+        switch ($transientValue) {
+            case V_UNSELECTED_VALUE:
+                $transientValue = null;
+                break;
+
+            case V_LITERAL_TRUE:
+                $transientValue = 1;
+                break;
+
+            case V_LITERAL_FALSE:
+                $transientValue = 0;
+                break;
         }
 
         $validator = array_key_exists(PROP_VALIDATE, $attribs) && is_callable($attribs[PROP_VALIDATE])

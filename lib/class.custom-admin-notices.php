@@ -77,7 +77,7 @@ class customAdminNotices {
     echo "<br>";
 
 
-    if($options["allow-environments"]){
+    if(isset($options["allow-environments"])){
       echo "<p>" . __("Show only when these criterias are met?", "custom-admin-notices") . "</p>";
 
       if($options["determine-environment"]){
@@ -113,11 +113,12 @@ class customAdminNotices {
 
   public function saveMeta($post_id){
 
+
       if(!$post_id){
         return false;
       }
 
-      if(get_post_type($post_id) !== "notice"){
+      if(get_post_type($post_id) !== "custom_notice"){
         return $post_id;
       }
 
@@ -132,6 +133,8 @@ class customAdminNotices {
 
         $p[$key] = stripslashes(strip_tags($value));
       }
+
+
 
       $nonce = !empty($p['can_noncename']) ? wp_verify_nonce($p['can_noncename'], plugin_basename(__FILE__)) : false;
       $can_edit = current_user_can('edit_post', $post_id);
@@ -242,11 +245,11 @@ EOT;
 
       $env = get_post_meta($post->ID, "can_environment", true);
 
-      if($options["determine-environment"] && $options["allow-environments"]){
+      if(isset($options["determine-environment"]) && isset($options["allow-environments"])){
         if(!in_array(getenv("WP_ENV"), $env)){
           $show_banner = false;
         }
-      } elseif($options["allow-environments"]) {
+      } elseif(isset($options["allow-environments"])) {
         $pageurl = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
         $env = !empty($env) ? $env : 'not-empty-needle'; // FFS if your URL actually contains "not-empty-needle".
         if(!(strpos($pageurl, $env) > -1)){

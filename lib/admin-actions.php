@@ -172,6 +172,10 @@ function renderField($args)
             renderCheckbox($args);
             break;
 
+        case Settings\FIELD_TOGGLE:
+            renderToggle($args);
+            break;
+
         default:
             error_log("Unknown field type: " . $args[Settings\PROP_TYPE]);
             break;
@@ -279,8 +283,6 @@ function renderCheckbox($args)
     $useKeyForValue = isAssocArray($args[Settings\PROP_OPTIONS]);
     $valueFlipped = is_array($args[Settings\PROP_VALUE]) ? array_flip($args[Settings\PROP_VALUE]) : array();
 
-    error_log(json_encode(Settings\PROP_OPTIONS));
-
     foreach ($args[Settings\PROP_OPTIONS] as $value => $label):
         $selected = array_key_exists($useKeyForValue ? $value : $label, $valueFlipped);
         $fieldValue = $useKeyForValue ? $value : $label;
@@ -298,6 +300,31 @@ function renderCheckbox($args)
         >
 
         <?php echo $label ?></label> <?php if ($isDefault): ?>(default)<?php endif; ?><br>
+    <?php
+    endforeach;
+}
+
+function renderToggle($args) {
+    $selectedValue = !is_null($args[Settings\PROP_VALUE])
+        ? $args[Settings\PROP_VALUE]
+        : $args[Settings\PROP_DEFAULT];
+
+    $options = $args[Settings\PROP_OPTIONS] && 2 <= count($args[Settings\PROP_OPTIONS])
+        ? array_slice(array_values($args[Settings\PROP_OPTIONS]), 0, 2)
+        : array("Off", "On");
+
+    foreach ($options as $value => $label):
+        $selected = !!$value === $selectedValue;
+        $isDefault = !!$value === $args[Settings\PROP_DEFAULT];
+        $fieldValue = !!$value ? Settings\V_LITERAL_TRUE : Settings\V_LITERAL_FALSE;
+        ?>
+
+        <label><input
+            type="radio"
+            name="<?php echo getFieldName($args) ?>"
+            value="<?php echo $fieldValue ?>"
+            <?php if ($selected): ?>checked<?php endif; ?>
+        > <?php echo $label ?></label> <?php if ($isDefault): ?>(default)<?php endif; ?><br>
     <?php
     endforeach;
 }

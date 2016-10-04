@@ -29,3 +29,8 @@ Contributions welcome! Feature wishlist:
 
 * More hooks!
 * Translations?
+
+Licence
+------
+
+This plugin uses [https://github.com/nikcorg/wp-plugin-stem](https://github.com/nikcorg/wp-plugin-stem) as a stem. The stem itself is MIT-licenced, but the rest of the plugin code is GPLv2, the same as WordPress itself. 
