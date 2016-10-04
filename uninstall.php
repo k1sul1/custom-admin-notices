@@ -6,3 +6,5 @@ if (!defined('WP_UNINSTALL_PLUGIN')) {
 foreach((get_posts(array("post_type" => "custom_notice", "posts_per_page" => -1))) as $post){
   wp_delete_post($post->ID, true);
 }
+
+delete_option('can_settings');

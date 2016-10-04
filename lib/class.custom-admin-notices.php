@@ -50,7 +50,10 @@ class customAdminNotices {
     $nonce = wp_create_nonce(plugin_basename(__FILE__));
 
     $options = Settings\getFieldValues(true, "default");
-    var_dump($options);
+
+    if(defined('WP_DEBUG') && WP_DEBUG){
+      // var_dump($options);
+    }
 
     echo "<input type='hidden' name='can_noncename' value='$nonce'>";
 
@@ -78,13 +81,21 @@ class customAdminNotices {
 
 
     if($options["allow-environments"]){
+      $env = !empty(getenv("WP_ENV")) ? getenv("WP_ENV") : 'undefined'; // We want to print this.
+
       echo "<p>" . __("Show only when these criterias are met?", "custom-admin-notices") . "</p>";
+      echo "<p style='font-size: 0.6em; margin-top: -1.4em;'>" . __("Your current environment:", "custom-admin-notices") . " $env</p>";
 
       if($options["determine-environment"]){
         foreach(explode("\r\n", strtolower($options["environments"])) as $line){
           $checked = "";
 
-          if(strpos($environment, $line) > -1){
+          if(!is_array($environment)){
+            error_log("Custom Admin Notices: Did you change the environment settings? Invalid value set for environment when rendering environment options.");
+            $environment = array();
+          }
+
+          if(in_array($line, $environment)){
             $checked = "checked='checked'";
           }
 
@@ -99,8 +110,12 @@ class customAdminNotices {
       } else {
         $value = "";
 
-        if(!empty($environment)){
+        if(!empty($environment) && !is_array($environment)){
           $value = "value='$environment'";
+        } else {
+          // If the value is an array, or something, the settings must have changed.
+          echo "<p style='font-size: 0.6em; line-height: 1.0em; color: red;'>" . __("Incompatible value set, did you change the settings? If you meant to do this, feel free to ignore this.", "custom-admin-notices") . "</p>";
+          $value = "value='example.com'";
         }
 
         echo "<label>Match by URL:<br>";
@@ -113,11 +128,12 @@ class customAdminNotices {
 
   public function saveMeta($post_id){
 
+
       if(!$post_id){
         return false;
       }
 
-      if(get_post_type($post_id) !== "notice"){
+      if(get_post_type($post_id) !== "custom_notice"){
         return $post_id;
       }
 
@@ -130,8 +146,19 @@ class customAdminNotices {
           continue;
         }
 
-        $p[$key] = stripslashes(strip_tags($value));
+        if(is_array($value)){
+          foreach($value as $k => $v){
+            $value[$k] = stripslashes(strip_tags($v));
+          }
+          $p[$key] = $value;
+        } else {
+          $p[$key] = stripslashes(strip_tags($value));
+        }
+
+
       }
+
+
 
       $nonce = !empty($p['can_noncename']) ? wp_verify_nonce($p['can_noncename'], plugin_basename(__FILE__)) : false;
       $can_edit = current_user_can('edit_post', $post_id);
@@ -176,8 +203,8 @@ class customAdminNotices {
   }
 
   public function ajaxDismiss(){
-      $user = (int) $_POST['user_id'];
-      $notice_id = (int) $_POST['notice_id'];
+      $user = (int) @$_POST['user_id'];
+      $notice_id = (int) @$_POST['notice_id'];
 
 
       $dismissed = get_user_meta($user, "dismissed_notices", true);
@@ -243,17 +270,21 @@ EOT;
       $env = get_post_meta($post->ID, "can_environment", true);
 
       if($options["determine-environment"] && $options["allow-environments"]){
+        if(!is_array($env)){
+          error_log("Custom Admin Notices: Did you change the environment settings? Invalid value set for environment when rendering banner.");
+          $env = array();
+        }
+
         if(!in_array(getenv("WP_ENV"), $env)){
           $show_banner = false;
         }
-      } elseif($options["allow-environments"]) {
+      } elseif(isset($options["allow-environments"])) {
         $pageurl = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
         $env = !empty($env) ? $env : 'not-empty-needle'; // FFS if your URL actually contains "not-empty-needle".
         if(!(strpos($pageurl, $env) > -1)){
           $show_banner = false;
         }
       }
-
 
       if(!$is_dismissible){
         $user_dismissed = false;

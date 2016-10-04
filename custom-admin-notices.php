@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Custom admin notices
- * Version: 0.3-1-alpha
+ * Version: 0.4-alpha
  * Description: This plugin allows you to create your own notices that show up in the WordPress admin.
  * Author: Christian Nikkanen
  * Author URI: https://github.com/k1sul1/
