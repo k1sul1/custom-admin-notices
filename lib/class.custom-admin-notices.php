@@ -50,7 +50,10 @@ class customAdminNotices {
     $nonce = wp_create_nonce(plugin_basename(__FILE__));
 
     $options = Settings\getFieldValues(true, "default");
-    var_dump($options);
+
+    if(defined('WP_DEBUG') && WP_DEBUG){
+      var_dump($options);
+    }
 
     echo "<input type='hidden' name='can_noncename' value='$nonce'>";
 
@@ -256,7 +259,6 @@ EOT;
           $show_banner = false;
         }
       }
-
 
       if(!$is_dismissible){
         $user_dismissed = false;
