@@ -52,7 +52,7 @@ class customAdminNotices {
     $options = Settings\getFieldValues(true, "default");
 
     if(defined('WP_DEBUG') && WP_DEBUG){
-      var_dump($options);
+      // var_dump($options);
     }
 
     echo "<input type='hidden' name='can_noncename' value='$nonce'>";
@@ -80,14 +80,22 @@ class customAdminNotices {
     echo "<br>";
 
 
-    if(isset($options["allow-environments"])){
+    if($options["allow-environments"]){
+      $env = !empty(getenv("WP_ENV")) ? getenv("WP_ENV") : 'undefined'; // We want to print this.
+
       echo "<p>" . __("Show only when these criterias are met?", "custom-admin-notices") . "</p>";
+      echo "<p style='font-size: 0.6em; margin-top: -1.4em;'>" . __("Your current environment:", "custom-admin-notices") . " $env</p>";
 
       if($options["determine-environment"]){
         foreach(explode("\r\n", strtolower($options["environments"])) as $line){
           $checked = "";
 
-          if(strpos($environment, $line) > -1){
+          if(!is_array($environment)){
+            error_log("Custom Admin Notices: Did you change the environment settings? Invalid value set for environment when rendering environment options.");
+            $environment = array(); 
+          }
+
+          if(in_array($line, $environment)){
             $checked = "checked='checked'";
           }
 
@@ -102,8 +110,12 @@ class customAdminNotices {
       } else {
         $value = "";
 
-        if(!empty($environment)){
+        if(!empty($environment) && !is_array($environment)){
           $value = "value='$environment'";
+        } else {
+          // If the value is an array, or something, the settings must have changed.
+          echo "<p style='font-size: 0.6em; line-height: 1.0em; color: red;'>" . __("Incompatible value set, did you change the settings? If you meant to do this, feel free to ignore this.", "custom-admin-notices") . "</p>";
+          $value = "value='example.com'";
         }
 
         echo "<label>Match by URL:<br>";
@@ -134,7 +146,16 @@ class customAdminNotices {
           continue;
         }
 
-        $p[$key] = stripslashes(strip_tags($value));
+        if(is_array($value)){
+          foreach($value as $k => $v){
+            $value[$k] = stripslashes(strip_tags($v));
+          }
+          $p[$key] = $value;
+        } else {
+          $p[$key] = stripslashes(strip_tags($value));
+        }
+
+
       }
 
 
@@ -248,8 +269,13 @@ EOT;
 
       $env = get_post_meta($post->ID, "can_environment", true);
 
-      if(isset($options["determine-environment"]) && isset($options["allow-environments"])){
-        if(strpos($env, getenv("WP_ENV")) === -1){
+      if($options["determine-environment"] && $options["allow-environments"]){
+        if(!is_array($env)){
+          error_log("Custom Admin Notices: Did you change the environment settings? Invalid value set for environment when rendering banner.");
+          $env = array();
+        }
+
+        if(!in_array(getenv("WP_ENV"), $env)){
           $show_banner = false;
         }
       } elseif(isset($options["allow-environments"])) {

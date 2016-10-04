@@ -23,30 +23,30 @@ function getFields()
     $fields = array(
         array(
           PROP_SECTION => SECTION_DEFAULT,
-          PROP_TYPE => FIELD_SELECT,
+          PROP_TYPE => FIELD_TOGGLE,
           PROP_NAME => "allow-environments",
           PROP_TITLE => "Allow environments? (Bedrock)",
           PROP_DEFAULT => false,
           PROP_DESCRIPTION => "Enabling this will allow you to select environments
           in which the notice will be shown.<br>Exceptionally useful if you want to show a notice
           for yourself only.",
-          PROP_OPTIONS => array("true" => "Yes", "false" => "No")
+          //PROP_OPTIONS => array("true" => "Yes", "false" => "No")
         ),
         array(
           PROP_SECTION => SECTION_DEFAULT,
-          PROP_TYPE => FIELD_RADIO,
+          PROP_TYPE => FIELD_TOGGLE,
           PROP_NAME => "determine-environment",
           PROP_TITLE => "Determine environment from WP_ENV?",
           PROP_DEFAULT => false,
           PROP_DESCRIPTION => "Enable to determine environment from WP_ENV environment variable. Default is match-by-URL.<br>Only effective if allow-environments is set to true.",
-          PROP_OPTIONS => array("true" => "Yes", "false" => "No")
+          // PROP_OPTIONS => array("true" => "Yes", "false" => "No")
         ),
         array(
           PROP_SECTION => SECTION_DEFAULT,
           PROP_TYPE => FIELD_TEXT_MULTILINE,
           PROP_NAME => "environments",
           PROP_TITLE => "Environments",
-          PROP_DEFAULT => "development\nstaging\nproduction",
+          PROP_DEFAULT => "development\r\nstaging\r\nproduction",
           PROP_DESCRIPTION => "List environments in use. One environment per line. Case insensitive. <br>Defaults: development, staging, production."
         )
     );
