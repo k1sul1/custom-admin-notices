@@ -49,13 +49,21 @@ function registerSettingsPage()
 {
     $settings = Settings\getSettings();
 
-    add_plugins_page(
+    add_submenu_page(
+      'edit.php?post_type=custom_notice',
+      $settings[Settings\S_PAGE_TITLE],
+      $settings[Settings\S_MENU_TITLE],
+      $settings[Settings\S_REQUIRE_CAPS],
+      $settings[Settings\S_PAGE_NAME],
+      getPageRenderer()
+    );
+    /*add_plugins_page(
         $settings[Settings\S_PAGE_TITLE],
         $settings[Settings\S_MENU_TITLE],
         $settings[Settings\S_REQUIRE_CAPS],
         $settings[Settings\S_PAGE_NAME],
         getPageRenderer()
-    );
+    );*/
 }
 
 function getErrorCallback()
