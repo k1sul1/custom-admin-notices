@@ -249,7 +249,7 @@ EOT;
       $env = get_post_meta($post->ID, "can_environment", true);
 
       if(isset($options["determine-environment"]) && isset($options["allow-environments"])){
-        if(!in_array(getenv("WP_ENV"), $env)){
+        if(strpos($env, getenv("WP_ENV")) === -1){
           $show_banner = false;
         }
       } elseif(isset($options["allow-environments"])) {

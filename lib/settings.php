@@ -16,6 +16,7 @@ function getSections()
         )
     );
 }
+
 function getFields()
 {
     // Add fields here
