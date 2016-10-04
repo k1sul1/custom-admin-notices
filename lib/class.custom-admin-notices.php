@@ -92,7 +92,7 @@ class customAdminNotices {
 
           if(!is_array($environment)){
             error_log("Custom Admin Notices: Did you change the environment settings? Invalid value set for environment when rendering environment options.");
-            $environment = array(); 
+            $environment = array();
           }
 
           if(in_array($line, $environment)){
@@ -203,8 +203,8 @@ class customAdminNotices {
   }
 
   public function ajaxDismiss(){
-      $user = (int) $_POST['user_id'];
-      $notice_id = (int) $_POST['notice_id'];
+      $user = (int) @$_POST['user_id'];
+      $notice_id = (int) @$_POST['notice_id'];
 
 
       $dismissed = get_user_meta($user, "dismissed_notices", true);
