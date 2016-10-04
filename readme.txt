@@ -13,7 +13,7 @@ This plugin adds a new post type called notices that are displayed in the WordPr
 
 == Frequently Asked Questions ==
 - Why would I use this? 
-If you need a handy way to annoy your users with
+If you need a handy way to annoy your users with important banners.
 
 == Screenshots ==
 1. View from WP-admin.
