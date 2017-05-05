@@ -81,7 +81,7 @@ class customAdminNotices {
 
 
     if($options["allow-environments"]){
-      $env = !empty(getenv("WP_ENV")) ? getenv("WP_ENV") : 'undefined'; // We want to print this.
+      $env = !empty(getenv("WP_ENV")) ? getenv("WP_ENV") : 'development'; // We want to print this.
 
       echo "<p>" . __("Show only when these criterias are met?", "custom-admin-notices") . "</p>";
       echo "<p style='font-size: 0.6em; margin-top: -1.4em;'>" . __("Your current environment:", "custom-admin-notices") . " $env</p>";
