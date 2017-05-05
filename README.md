@@ -1,4 +1,4 @@
-#Custom admin notices
+# Custom admin notices
 This WordPress plugin allows you to easily create custom notices that are displayed in WP-admin.
 
 [![Build Status](https://travis-ci.org/k1sul1/custom-admin-notices.svg?branch=master)](https://travis-ci.org/k1sul1/custom-admin-notices)
